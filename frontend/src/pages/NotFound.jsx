@@ -3,7 +3,7 @@ import { ArrowLeft, FileQuestion } from "lucide-react"
 
 export default function NotFound() {
   return (
-    <div className="rounded-lg border border-dashed border-base-300 bg-base-200/60 p-10 text-center">
+    <div className="rounded-lg border border-dashed border-white/15 bg-base-200/60 p-8 text-center sm:p-10">
       <div className="mx-auto flex max-w-md flex-col items-center gap-4">
         <div className="rounded-full bg-primary/10 p-4 text-primary">
           <FileQuestion size={34} aria-hidden="true" />

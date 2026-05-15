@@ -12,7 +12,7 @@ export default function ActionBar({
     <div className="flex flex-wrap gap-2">
       <button
         type="button"
-        className="btn btn-outline btn-sm gap-2"
+        className="btn btn-outline btn-sm gap-2 border-white/15 hover:border-secondary/55 hover:bg-secondary/10"
         onClick={onEdit}
         disabled={editDisabled}
       >

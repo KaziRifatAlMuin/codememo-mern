@@ -3,7 +3,7 @@ import mongoose from "mongoose"
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id)
 
-const allowedDifficulties = new Set(["Easy", "Medium", "Hard"])
+const allowedDifficulties = new Set(["Easy", "Medium", "Medium-Hard", "Hard", "Very Hard"])
 const allowedLanguages = new Set(["cpp", "python", "javascript"])
 const allowedStatuses = new Set(["New", "Revised", "Mastered"])
 
@@ -12,7 +12,7 @@ const cleanTags = (tags) => {
         return tags
             .map((tag) => (typeof tag === "string" ? tag.trim() : ""))
             .filter(Boolean)
-            .slice(0, 8)
+            .slice(0, 12)
     }
 
     if (typeof tags === "string") {
@@ -20,7 +20,7 @@ const cleanTags = (tags) => {
             .split(",")
             .map((tag) => tag.trim())
             .filter(Boolean)
-            .slice(0, 8)
+            .slice(0, 12)
     }
 
     return []

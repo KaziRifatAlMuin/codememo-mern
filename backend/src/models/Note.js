@@ -7,7 +7,7 @@ const noteSchema = new mongoose.Schema(
     tags: { type: [String], default: [] },
     difficulty: {
       type: String,
-      enum: ["Easy", "Medium", "Hard"],
+      enum: ["Easy", "Medium", "Medium-Hard", "Hard", "Very Hard"],
       default: "Medium",
     },
     language: {

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import Note from '../models/Note.js'
+import Tag from '../models/Tag.js'
 import connectDB from '../config/db.js'
 
 dotenv.config()
@@ -33,6 +34,13 @@ const seed = async () => {
     ]
 
     await Note.deleteMany({})
+    await Tag.deleteMany({})
+    await Tag.insertMany([
+      { name: 'algorithms', color: 'cyan' },
+      { name: 'search', color: 'blue' },
+      { name: 'data-structures', color: 'purple' },
+      { name: 'trees', color: 'orange' },
+    ])
     const created = await Note.insertMany(sampleNotes)
     console.log(`Inserted ${created.length} notes`)
     process.exit(0)

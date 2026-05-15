@@ -3,15 +3,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, CalendarDays, ExternalLink } from "lucide-react"
 import toast from "react-hot-toast"
 import { deleteNote, fetchNoteById, notesKeys } from "../api/notesApi.js"
+import { fetchTags, tagsKeys } from "../api/tagsApi.js"
 import ActionBar from "../components/ActionBar.jsx"
 import CodeBlock from "../components/CodeBlock.jsx"
 import MarkdownPreview from "../components/MarkdownPreview.jsx"
 import {
+  colorForTag,
   difficultyClass,
   languageLabel,
   normalizeNote,
   platformFromUrl,
   statusClass,
+  tagColorClass,
 } from "../utils/noteMeta.js"
 
 export default function NoteDetail() {
@@ -27,6 +30,11 @@ export default function NoteDetail() {
     queryKey: notesKeys.detail(id),
     queryFn: () => fetchNoteById(id),
     enabled: Boolean(id),
+  })
+
+  const { data: tags = [] } = useQuery({
+    queryKey: tagsKeys.all,
+    queryFn: fetchTags,
   })
 
   const deleteMutation = useMutation({
@@ -45,12 +53,12 @@ export default function NoteDetail() {
   }
 
   if (isLoading) {
-    return <div className="skeleton h-72 rounded-lg" />
+    return <div className="skeleton h-64 rounded-lg" />
   }
 
   if (error || !note) {
     return (
-      <div className="rounded-lg border border-dashed border-base-300 bg-base-200/60 p-10 text-center">
+      <div className="rounded-lg border border-dashed border-white/15 bg-base-200/60 p-8 text-center sm:p-10">
         <div className="mx-auto flex max-w-md flex-col items-center gap-4">
           <h3 className="text-xl font-semibold">Note not found</h3>
           <p className="text-base-content/70">
@@ -74,13 +82,13 @@ export default function NoteDetail() {
 
   return (
     <section className="surface-panel mx-auto w-full max-w-5xl rounded-lg">
-      <div className="flex flex-col gap-6 p-4 sm:p-6">
+      <div className="flex flex-col gap-5 p-4 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl space-y-3">
             <div className="badge badge-secondary badge-outline">CodeMemo Detail</div>
-            <h1 className="text-2xl font-bold sm:text-3xl">{memo.title}</h1>
+            <h1 className="text-xl font-bold sm:text-2xl">{memo.title}</h1>
             <div className="flex flex-wrap gap-2">
-              <span className={`badge ${difficultyClass[memo.difficulty]}`}>{memo.difficulty}</span>
+              <span className={`badge border ${difficultyClass[memo.difficulty]}`}>{memo.difficulty}</span>
               <span className={`badge ${statusClass[memo.revisionStatus]}`}>
                 {memo.revisionStatus}
               </span>
@@ -99,11 +107,11 @@ export default function NoteDetail() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px]">
-          <div className="rounded-lg border border-base-300 bg-base-100/70 p-4 sm:p-5">
+          <div className="rounded-lg border border-white/10 bg-base-100/70 p-4 sm:p-5">
             <MarkdownPreview content={memo.content} />
           </div>
 
-          <aside className="grid content-start gap-3 rounded-lg border border-base-300 bg-base-100/70 p-4">
+          <aside className="grid content-start gap-3 rounded-lg border border-white/10 bg-base-100/70 p-4">
             <div>
               <p className="text-xs uppercase text-base-content/45">Problem</p>
               {memo.problemUrl ? (
@@ -125,7 +133,7 @@ export default function NoteDetail() {
               <div className="mt-2 flex flex-wrap gap-2">
                 {memo.tags.length ? (
                   memo.tags.map((tag) => (
-                    <span key={tag} className="badge badge-ghost badge-sm">
+                    <span key={tag} className={`badge badge-sm border ${tagColorClass[colorForTag(tag, tags)]}`}>
                       #{tag}
                     </span>
                   ))
@@ -139,7 +147,7 @@ export default function NoteDetail() {
 
         {memo.codeSnippet ? (
           <div className="code-window">
-            <div className="flex items-center justify-between border-b border-base-300 px-4 py-2 text-xs text-base-content/55">
+            <div className="flex items-center justify-between border-b border-white/10 px-4 py-2 text-xs text-base-content/55">
               <span>{languageLabel(memo.language)}</span>
               <span>syntax highlighted snippet</span>
             </div>
@@ -148,7 +156,7 @@ export default function NoteDetail() {
         ) : null}
 
         <div>
-          <Link className="btn btn-ghost btn-sm gap-2" to="/">
+          <Link className="btn btn-ghost btn-sm gap-2 hover:bg-white/5" to="/">
             <ArrowLeft size={16} aria-hidden="true" />
             Back to All Notes
           </Link>
