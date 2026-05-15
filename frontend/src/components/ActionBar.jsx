@@ -1,3 +1,5 @@
+import { Pencil, Trash2 } from "lucide-react"
+
 export default function ActionBar({
   onEdit,
   onDelete,
@@ -7,21 +9,23 @@ export default function ActionBar({
   deleteLabel = "Delete",
 }) {
   return (
-    <div className="action-bar">
+    <div className="flex flex-wrap gap-2">
       <button
         type="button"
-        className="btn ghost"
+        className="btn btn-outline btn-sm gap-2"
         onClick={onEdit}
         disabled={editDisabled}
       >
+        <Pencil size={16} aria-hidden="true" />
         {editLabel}
       </button>
       <button
         type="button"
-        className="btn danger"
+        className="btn btn-error btn-sm gap-2"
         onClick={onDelete}
         disabled={deleteDisabled}
       >
+        <Trash2 size={16} aria-hidden="true" />
         {deleteLabel}
       </button>
     </div>

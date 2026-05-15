@@ -1,13 +1,18 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001"
 const BASE_URL = `${API_URL}/api/notes`
 
+export const notesKeys = {
+  all: ["notes"],
+  detail: (id) => ["notes", id],
+}
+
 async function handleResponse(response) {
   if (!response.ok) {
     let message = "Request failed"
     try {
       const payload = await response.json()
       message = payload?.message || message
-    } catch (err) {
+    } catch {
       message = response.statusText || message
     }
     throw new Error(message)

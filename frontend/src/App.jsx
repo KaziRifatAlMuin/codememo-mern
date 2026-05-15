@@ -4,7 +4,6 @@ import Home from "./pages/Home.jsx"
 import NoteDetail from "./pages/NoteDetail.jsx"
 import NoteEditor from "./pages/NoteEditor.jsx"
 import NotFound from "./pages/NotFound.jsx"
-import "./App.css"
 
 function App() {
   return (

@@ -1,157 +1,239 @@
 # MERN Thinkboard
 
-## Overview
+Thinkboard is a full-stack notes app built with MongoDB, Express, React, Vite, Tailwind CSS, DaisyUI, TanStack Query, and Docker.
 
-This project includes a MongoDB-backed notes API for a MERN stack. The backend connects to MongoDB via Mongoose and exposes REST endpoints under `/api/notes`.
+## What You Need
 
-## Prerequisites
+Install these first:
 
-- Node.js 18+ and npm
-- Docker Desktop for Windows (recommended for local MongoDB): https://www.docker.com/products/docker-desktop/
+- [Node.js 20+](https://nodejs.org/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) if you want the easiest setup
+- Git
 
-## Quick start (full stack with Docker)
+The app uses these local ports:
 
-Build and run everything (MongoDB, API, frontend):
+| Service | URL |
+| --- | --- |
+| Frontend | `http://localhost:5173` |
+| Backend API | `http://localhost:5001` |
+| API health check | `http://localhost:5001/api/health` |
+| MongoDB | `mongodb://localhost:27017/thinkboard-db` |
+| Mongo Express | `http://localhost:8081` |
 
-```powershell
-docker compose up --build -d
-```
+## Fastest Start: Docker
 
-View links:
-
-- Frontend: http://localhost:5173
-- API health: http://localhost:5001/api/health
-- Mongo Express UI: http://localhost:8081
-
-## Backend setup (first time)
-
-Install backend dependencies:
+From the project root:
 
 ```powershell
-cd backend
-npm install
+docker compose up --build
 ```
 
-Create an environment file from the example:
+Open:
 
-```powershell
-Copy-Item .env.example .env
+```text
+http://localhost:5173
 ```
 
-Update `MONGO_URI` in `.env` if you use a different database connection string.
-Update `CORS_ORIGIN` if your frontend runs on a different URL.
+Docker starts MongoDB, Mongo Express, the Express backend, and the Vite frontend preview server. The containers wait for MongoDB and the backend health check before starting dependent services.
 
-## Database setup (Docker, recommended)
-
-The repo includes a `docker-compose.yml` that runs MongoDB and Mongo Express for easy local inspection.
-
-Step 1: Start the database services:
-
-```powershell
-docker compose up -d
-```
-
-Step 2: Check that both containers are running:
-
-```powershell
-docker compose ps
-```
-
-Step 3: Use the default local connection string in `.env`:
-
-```
-mongodb://localhost:27017/thinkboard-db
-```
-
-Step 4 (optional): Open Mongo Express in your browser:
-
-- http://localhost:8081
-
-To stop the containers:
+Stop everything:
 
 ```powershell
 docker compose down
 ```
 
-### Alternative: MongoDB Atlas (cloud)
+Remove the MongoDB data volume and start fresh:
 
-1. Create a free cluster at https://www.mongodb.com/cloud/atlas and create a database user.
-2. Whitelist your IP (or allow access from anywhere for quick testing).
-3. Copy the connection string provided by Atlas and set it as `MONGO_URI` in `.env`.
-
-Example:
-
-```
-mongodb+srv://<username>:<password>@cluster0.abcd1.mongodb.net/thinkboard-db?retryWrites=true&w=majority
+```powershell
+docker compose down -v
+docker compose up --build
 ```
 
-## Run the backend
+## Local Development Without Docker
+
+Use this when you want hot reload for backend and frontend development.
+
+### 1. Start MongoDB
+
+Option A, with Docker:
+
+```powershell
+docker compose up mongo mongo-express
+```
+
+Option B, with a MongoDB installation on your machine:
+
+```powershell
+mongod
+```
+
+### 2. Configure Backend
 
 ```powershell
 cd backend
-npm run dev
-```
-
-Health check:
-
-- http://localhost:5001/api/health
-
-## Frontend setup (Vite + React)
-
-Install frontend dependencies:
-
-```powershell
-cd frontend
+copy .env.example .env
 npm install
-```
-
-Create an environment file from the example:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Set `VITE_API_URL` in `.env` if your backend runs on a different URL.
-
-Install router and toast notifications:
-
-```powershell
-cd frontend
-npm install react-router-dom react-hot-toast
-```
-
-Start the frontend dev server:
-
-```powershell
 npm run dev
 ```
 
-Frontend view link (Vite dev server):
+Backend `.env`:
 
-- http://localhost:5173
+```env
+MONGO_URI=mongodb://localhost:27017/thinkboard-db
+PORT=5001
+CORS_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
+MONGO_CONNECT_ATTEMPTS=10
+```
 
-## View links
+The backend should show:
 
-- API health: http://localhost:5001/api/health
-- Mongo Express UI: http://localhost:8081
-- Frontend (dev): http://localhost:5173
+```text
+MongoDB connected
+Server is running on port 5001
+```
 
-## API endpoints
+### 3. Configure Frontend
 
-- `GET /api/notes`
-- `GET /api/notes/:id`
-- `POST /api/notes`
-- `PUT /api/notes/:id`
-- `DELETE /api/notes/:id`
+Open a second terminal:
+
+```powershell
+cd frontend
+copy .env.example .env
+npm install
+npm run dev
+```
+
+Frontend `.env`:
+
+```env
+VITE_API_URL=http://localhost:5001
+```
+
+Open:
+
+```text
+http://localhost:5173
+```
+
+## Useful Commands
+
+Run frontend checks:
+
+```powershell
+cd frontend
+npm run lint
+npm run build
+```
+
+Seed MongoDB with example notes:
+
+```powershell
+cd backend
+npm run seed
+```
+
+Start backend normally:
+
+```powershell
+cd backend
+npm start
+```
+
+Start frontend production preview:
+
+```powershell
+cd frontend
+npm run build
+npm run preview -- --host 0.0.0.0 --port 5173
+```
+
+## API Routes
+
+Base URL:
+
+```text
+http://localhost:5001/api/notes
+```
+
+| Method | Route | Description |
+| --- | --- | --- |
+| `GET` | `/api/notes` | Get all notes |
+| `GET` | `/api/notes/:id` | Get one note |
+| `POST` | `/api/notes` | Create a note |
+| `PUT` | `/api/notes/:id` | Update a note |
+| `DELETE` | `/api/notes/:id` | Delete a note |
+| `GET` | `/api/health` | Backend and database health |
+
+Create or update payload:
+
+```json
+{
+  "title": "My note",
+  "content": "Details go here"
+}
+```
+
+## Project Structure
+
+```text
+MERN-Thinkboard/
+  backend/
+    src/
+      config/db.js
+      controllers/notesController.js
+      models/Note.js
+      routes/notesRoutes.js
+      server.js
+  frontend/
+    src/
+      api/notesApi.js
+      components/
+      pages/
+      App.jsx
+      main.jsx
+  docker-compose.yml
+```
 
 ## Troubleshooting
 
-If port `5001` is already in use, run these commands from PowerShell:
+If PowerShell blocks `npm`, use `npm.cmd` instead:
+
+```powershell
+npm.cmd install
+npm.cmd run dev
+```
+
+If port `5001` is already in use:
 
 ```powershell
 Get-NetTCPConnection -LocalPort 5001 | Select-Object -ExpandProperty OwningProcess
-Stop-Process -Id 12244 -Force
-npm run dev
+Stop-Process -Id YOUR_PROCESS_ID -Force
 ```
 
-Replace `12244` with the process ID returned by the first command.
+If port `5173` is already in use:
+
+```powershell
+Get-NetTCPConnection -LocalPort 5173 | Select-Object -ExpandProperty OwningProcess
+Stop-Process -Id YOUR_PROCESS_ID -Force
+```
+
+If Docker containers behave strangely after dependency or database changes:
+
+```powershell
+docker compose down -v
+docker compose up --build
+```
+
+If the frontend says requests are failing:
+
+- Make sure the backend is running on `http://localhost:5001`.
+- Visit `http://localhost:5001/api/health`.
+- Make sure `frontend/.env` has `VITE_API_URL=http://localhost:5001`.
+- Make sure `backend/.env` allows the frontend origin in `CORS_ORIGIN`.
+
+## Notes
+
+- Frontend styling uses Tailwind CSS and DaisyUI in `frontend/tailwind.config.js`.
+- Server state is managed with TanStack Query.
+- Docker uses named volume `mongo-data` so notes persist across restarts.
+- Mongo Express is only for local development.

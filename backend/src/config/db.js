@@ -1,47 +1,45 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const connectDB = async () => {
-  const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/thinkboard-db";
-  let attempts = 0;
+  const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/thinkboard-db"
+  const maxAttempts = Number(process.env.MONGO_CONNECT_ATTEMPTS || 10)
 
-  const connectWithRetry = async () => {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
-      attempts += 1;
       await mongoose.connect(mongoUri, {
-        // use the new URL parser and unified topology are defaults in mongoose v6+
-        // keep options here for clarity and future tweaks
         family: 4,
-      });
-      console.log("MongoDB connected");
+        serverSelectionTimeoutMS: 5000,
+      })
+      console.log("MongoDB connected")
+      break
     } catch (err) {
-      console.error(`MongoDB connection attempt ${attempts} failed:`, err.message || err);
-      if (attempts < 5) {
-        const delay = 2000 * attempts;
-        console.log(`Retrying in ${delay}ms...`);
-        setTimeout(connectWithRetry, delay);
-      } else {
-        console.error("Could not connect to MongoDB after several attempts. Exiting.");
-        process.exit(1);
-      }
-    }
-  };
+      const isFinalAttempt = attempt === maxAttempts
+      console.error(`MongoDB connection attempt ${attempt} failed:`, err.message || err)
 
-  await connectWithRetry();
+      if (isFinalAttempt) {
+        throw new Error("Could not connect to MongoDB after several attempts")
+      }
+
+      const delay = Math.min(1000 * attempt, 5000)
+      console.log(`Retrying MongoDB connection in ${delay}ms...`)
+      await sleep(delay)
+    }
+  }
 
   mongoose.connection.on("disconnected", () => {
-    console.warn("MongoDB disconnected");
-  });
+    console.warn("MongoDB disconnected")
+  })
 
-  // Graceful shutdown
-  const gracefulExit = () => {
-    mongoose.connection.close(() => {
-      console.log("MongoDB connection closed through app termination");
-      process.exit(0);
-    });
-  };
+  const gracefulExit = async () => {
+    await mongoose.connection.close()
+    console.log("MongoDB connection closed")
+    process.exit(0)
+  }
 
-  process.on("SIGINT", gracefulExit);
-  process.on("SIGTERM", gracefulExit);
-};
+  process.once("SIGINT", gracefulExit)
+  process.once("SIGTERM", gracefulExit)
+}
 
-export default connectDB;
+export default connectDB

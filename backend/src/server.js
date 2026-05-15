@@ -1,18 +1,28 @@
 import express from "express"
 import cors from "cors"
+import mongoose from "mongoose"
 import notesRoutes from "./routes/notesRoutes.js"
 import connectDB from "./config/db.js"
 import dotenv from "dotenv"
 
 dotenv.config()
 const app = express()
-const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5173"
+const corsOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean)
 
-app.use(cors({ origin: corsOrigin }))
+app.use(cors({ origin: corsOrigins }))
 app.use(express.json())
 app.use("/api/notes", notesRoutes)
 
-app.get("/api/health", (req, res) => res.status(200).json({ status: "ok" }))
+app.get("/api/health", (req, res) => {
+    const dbConnected = mongoose.connection.readyState === 1
+    res.status(dbConnected ? 200 : 503).json({
+        status: dbConnected ? "ok" : "degraded",
+        database: dbConnected ? "connected" : "disconnected",
+    })
+})
 
 const startServer = async () => {
     try {

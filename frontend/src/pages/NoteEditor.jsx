@@ -1,142 +1,178 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { ArrowLeft, Save, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
 import {
   createNote,
   deleteNote,
   fetchNoteById,
+  notesKeys,
   updateNote,
 } from "../api/notesApi.js"
-import ActionBar from "../components/ActionBar.jsx"
 
-export default function NoteEditor() {
-  const { id } = useParams()
+function NoteForm({ id, initialNote }) {
   const isEditMode = Boolean(id)
-  const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
-  const [loading, setLoading] = useState(isEditMode)
+  const [title, setTitle] = useState(initialNote?.title || "")
+  const [content, setContent] = useState(initialNote?.content || "")
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const titleRef = useRef(null)
 
-  useEffect(() => {
-    if (!isEditMode) return
+  const createMutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: (created) => {
+      const note = created.note || created
+      queryClient.invalidateQueries({ queryKey: notesKeys.all })
+      toast.success("Note created")
+      navigate(note?._id ? `/notes/${note._id}` : "/")
+    },
+    onError: (err) => toast.error(err.message),
+  })
 
-    const loadNote = async () => {
-      setLoading(true)
-      try {
-        const data = await fetchNoteById(id)
-        setTitle(data.title)
-        setContent(data.content)
-      } catch (err) {
-        toast.error(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
+  const updateMutation = useMutation({
+    mutationFn: (payload) => updateNote(id, payload),
+    onSuccess: (updated) => {
+      const note = updated.note || updated
+      queryClient.invalidateQueries({ queryKey: notesKeys.all })
+      queryClient.setQueryData(notesKeys.detail(id), note)
+      toast.success("Note updated")
+      navigate(`/notes/${id}`)
+    },
+    onError: (err) => toast.error(err.message),
+  })
 
-    loadNote()
-  }, [id, isEditMode])
+  const deleteMutation = useMutation({
+    mutationFn: deleteNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: notesKeys.all })
+      toast.success("Note deleted")
+      navigate("/")
+    },
+    onError: (err) => toast.error(err.message),
+  })
 
-  const handleSubmit = async (event) => {
+  const isSaving = createMutation.isPending || updateMutation.isPending
+
+  const handleSubmit = (event) => {
     event.preventDefault()
 
-    if (!title.trim() || !content.trim()) {
+    const payload = {
+      title: title.trim(),
+      content: content.trim(),
+    }
+
+    if (!payload.title || !payload.content) {
       toast.error("Title and content are required")
       return
     }
 
-    try {
-      if (isEditMode) {
-        await updateNote(id, { title, content })
-        toast.success("Note updated")
-      } else {
-        const created = await createNote({ title, content })
-        toast.success("Note created")
-        navigate(`/notes/${created.note?._id || created._id || ""}`)
-        return
-      }
-      navigate(`/notes/${id}`)
-    } catch (err) {
-      toast.error(err.message)
+    if (isEditMode) {
+      updateMutation.mutate(payload)
+    } else {
+      createMutation.mutate(payload)
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!isEditMode) {
-      toast("Create a note before deleting", { icon: "✍" })
+      toast("Save the note before deleting it")
       return
     }
 
     const confirmed = window.confirm("Delete this note?")
-    if (!confirmed) return
-
-    try {
-      await deleteNote(id)
-      toast.success("Note deleted")
-      navigate("/")
-    } catch (err) {
-      toast.error(err.message)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="page">
-        <div className="editor-card skeleton" />
-      </div>
-    )
+    if (confirmed) deleteMutation.mutate(id)
   }
 
   return (
-    <div className="page">
-      <section className="editor-card">
-        <div className="editor-header">
-          <div>
-            <p className="eyebrow">{isEditMode ? "UPDATE NOTE" : "NEW NOTE"}</p>
-            <h2>{isEditMode ? "Refine your thought." : "Start a new idea."}</h2>
+    <section className="surface-panel rounded-lg">
+      <div className="flex flex-col gap-6 p-5 md:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-2xl space-y-3">
+            <div className="badge badge-primary badge-outline">
+              {isEditMode ? "Update Note" : "New Note"}
+            </div>
+            <h1 className="text-3xl font-bold md:text-4xl">
+              {isEditMode ? "Refine this note." : "Start a new idea."}
+            </h1>
           </div>
-          <ActionBar
-            onEdit={() => titleRef.current?.focus()}
-            onDelete={handleDelete}
-            editLabel={isEditMode ? "Editing" : "Edit"}
-            editDisabled={!isEditMode}
-          />
+          <button
+            type="button"
+            className="btn btn-error btn-sm gap-2"
+            onClick={handleDelete}
+            disabled={deleteMutation.isPending}
+          >
+            <Trash2 size={16} aria-hidden="true" />
+            Delete
+          </button>
         </div>
 
-        <form className="editor-form" onSubmit={handleSubmit}>
-          <label>
-            Title
+        <form className="grid gap-5" onSubmit={handleSubmit}>
+          <label className="form-control w-full">
+            <div className="label">
+              <span className="label-text font-medium">Title</span>
+            </div>
             <input
               ref={titleRef}
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="Give the note a bold title"
+              placeholder="Give the note a clear title"
+              className="input input-bordered w-full bg-base-100"
+              autoFocus={!isEditMode}
             />
           </label>
-          <label>
-            Note
+
+          <label className="form-control w-full">
+            <div className="label">
+              <span className="label-text font-medium">Note</span>
+            </div>
             <textarea
-              rows="8"
+              rows="10"
               value={content}
               onChange={(event) => setContent(event.target.value)}
-              placeholder="Write your note with clarity and detail"
+              placeholder="Write the details here"
+              className="textarea textarea-bordered w-full bg-base-100 leading-7"
             />
           </label>
-          <div className="editor-actions">
-            <button type="submit" className="btn primary">
-              {isEditMode ? "Save changes" : "Create note"}
+
+          <div className="flex flex-wrap gap-3">
+            <button type="submit" className="btn btn-primary gap-2" disabled={isSaving}>
+              <Save size={18} aria-hidden="true" />
+              {isSaving ? "Saving..." : isEditMode ? "Save Changes" : "Create Note"}
             </button>
-            <button
-              type="button"
-              className="btn ghost"
-              onClick={() => navigate("/")}
-            >
+            <button type="button" className="btn btn-ghost gap-2" onClick={() => navigate("/")}>
+              <ArrowLeft size={18} aria-hidden="true" />
               Cancel
             </button>
           </div>
         </form>
-      </section>
-    </div>
+      </div>
+    </section>
   )
+}
+
+export default function NoteEditor() {
+  const { id } = useParams()
+  const isEditMode = Boolean(id)
+
+  const { data: existingNote, isLoading, error } = useQuery({
+    queryKey: notesKeys.detail(id),
+    queryFn: () => fetchNoteById(id),
+    enabled: isEditMode,
+  })
+
+  if (isLoading) {
+    return <div className="skeleton h-80 rounded-lg" />
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-error rounded-lg">
+        <span>{error.message}</span>
+      </div>
+    )
+  }
+
+  return <NoteForm key={id || "new-note"} id={id} initialNote={existingNote} />
 }
