@@ -10,8 +10,26 @@ const seed = async () => {
     await connectDB()
 
     const sampleNotes = [
-      { title: 'Welcome to Thinkboard', content: 'This is your first note.' },
-      { title: 'How to use', content: 'Create, update and delete notes via the API.' },
+      {
+        title: 'Binary Search',
+        content: '## Pattern\nUse when the answer space is monotonic.\n\n- Define low/high carefully\n- Keep the invariant visible\n- Test edge cases',
+        tags: ['algorithms', 'search'],
+        difficulty: 'Easy',
+        language: 'cpp',
+        codeSnippet: 'int lo = 0, hi = n - 1;\nwhile (lo <= hi) {\n  int mid = lo + (hi - lo) / 2;\n  if (ok(mid)) hi = mid - 1;\n  else lo = mid + 1;\n}',
+        problemUrl: 'https://codeforces.com/problemset',
+        revisionStatus: 'Revised',
+      },
+      {
+        title: 'Segment Tree',
+        content: 'Range queries with point or range updates. Keep merge logic small and reusable.',
+        tags: ['data-structures', 'trees'],
+        difficulty: 'Hard',
+        language: 'cpp',
+        codeSnippet: 'void update(int node, int start, int end, int idx, int val) {\n  if (start == end) tree[node] = val;\n}',
+        problemUrl: 'https://atcoder.jp/',
+        revisionStatus: 'New',
+      },
     ]
 
     await Note.deleteMany({})

@@ -8,16 +8,27 @@
   }
 
   body {
-    @apply min-h-screen bg-base-100 text-base-content;
+    @apply min-h-screen bg-base-100 text-base-content antialiased;
+    background:
+      linear-gradient(180deg, rgba(34, 197, 94, 0.08), transparent 320px),
+      linear-gradient(135deg, #0b1310 0%, #111c17 48%, #0b1310 100%);
   }
 }
 
 @layer components {
   .surface-panel {
-    @apply border border-base-300 bg-base-100 shadow-sm;
+    @apply border border-base-300 bg-base-200/80 shadow-sm;
   }
 
   .app-band {
     @apply border-y border-base-300 bg-base-200/70;
+  }
+
+  .code-window {
+    @apply overflow-hidden rounded-lg border border-base-300 bg-[#07100d] shadow-sm;
+  }
+
+  .code-window pre {
+    @apply overflow-x-auto p-4 text-sm leading-6 text-base-content/85;
   }
 }

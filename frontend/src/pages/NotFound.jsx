@@ -10,7 +10,7 @@ export default function NotFound() {
         </div>
         <div>
           <h1 className="text-2xl font-bold">Page not found</h1>
-          <p className="mt-2 text-base-content/70">Return to your notes and keep going.</p>
+          <p className="mt-2 text-base-content/70">Return to CodeMemo and keep solving.</p>
         </div>
         <Link className="btn btn-primary gap-2" to="/">
           <ArrowLeft size={18} aria-hidden="true" />

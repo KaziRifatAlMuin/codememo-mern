@@ -1,6 +1,6 @@
-# MERN Thinkboard
+# CodeMemo
 
-Thinkboard is a full-stack notes app built with MongoDB, Express, React, Vite, Tailwind CSS, DaisyUI, TanStack Query, and Docker.
+CodeMemo is a compact MERN note-taking app for competitive programmers and CSE students. It stores markdown study notes, code snippets, tags, problem links, difficulty, and revision status in a responsive dark dashboard.
 
 ## What You Need
 
@@ -168,8 +168,14 @@ Create or update payload:
 
 ```json
 {
-  "title": "My note",
-  "content": "Details go here"
+  "title": "Binary Search",
+  "content": "## Pattern\nUse when the answer space is monotonic.",
+  "tags": ["algorithms", "search"],
+  "difficulty": "Easy",
+  "language": "cpp",
+  "codeSnippet": "int lo = 0, hi = n - 1;",
+  "problemUrl": "https://codeforces.com/problemset",
+  "revisionStatus": "Revised"
 }
 ```
 
