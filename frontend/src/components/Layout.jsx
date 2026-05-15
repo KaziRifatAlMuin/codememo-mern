@@ -1,10 +1,11 @@
 import { Link, useLocation } from "react-router-dom"
-import { Home, Plus } from "lucide-react"
+import { Home, LogOut, Plus, Tags, User, Users } from "lucide-react"
+import { useAuth } from "../context/AuthContext.jsx"
 import logo2 from "../assets/logo2.png"
 
 function NavLink({ to, children, icon: Icon }) {
   const location = useLocation()
-  const isActive = location.pathname === to
+  const isActive = `${location.pathname}${location.search}` === to || (to === "/" && location.pathname === "/" && !location.search)
 
   return (
     <Link
@@ -20,6 +21,8 @@ function NavLink({ to, children, icon: Icon }) {
 }
 
 export default function Layout({ children }) {
+  const { user, isAdmin, logout } = useAuth()
+
   return (
     <div data-theme="codememo" className="min-h-screen pb-8">
       <header className="sticky top-0 z-20 border-b border-white/10 bg-base-100/80 backdrop-blur-xl">
@@ -30,19 +33,29 @@ export default function Layout({ children }) {
             </Link>
           </div>
           <nav className="navbar-center hidden gap-2 md:flex" aria-label="Primary navigation">
-            <NavLink to="/" icon={Home}>
-              Dashboard
-            </NavLink>
-            <NavLink to="/create" icon={Plus}>
-              Create
-            </NavLink>
+            {user ? (
+              <>
+                <NavLink to="/" icon={Home}>Memos</NavLink>
+                <NavLink to="/?tab=topics" icon={Tags}>Topics</NavLink>
+                <NavLink to="/create" icon={Plus}>New</NavLink>
+                {isAdmin ? <NavLink to="/users" icon={Users}>Users</NavLink> : null}
+              </>
+            ) : null}
           </nav>
           <div className="navbar-end">
-            <Link className="btn btn-primary btn-sm gap-2 border-0 shadow-[0_10px_30px_rgba(124,92,255,0.28)]" to="/create">
-              <Plus size={16} aria-hidden="true" />
-              <span className="hidden sm:inline">New Memo</span>
-              <span className="sm:hidden">New</span>
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <Link className="btn btn-ghost btn-sm gap-1.5 border border-white/10" to="/profile">
+                  <User size={15} aria-hidden="true" />
+                  <span className="hidden sm:inline">{user.name}</span>
+                </Link>
+                <button className="btn btn-ghost btn-sm" type="button" onClick={logout} aria-label="Logout">
+                  <LogOut size={15} aria-hidden="true" />
+                </button>
+              </div>
+            ) : (
+              <Link className="btn btn-primary btn-sm" to="/login">Login</Link>
+            )}
           </div>
         </div>
       </header>

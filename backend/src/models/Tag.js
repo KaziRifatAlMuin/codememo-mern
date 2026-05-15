@@ -8,11 +8,6 @@ const tagSchema = new mongoose.Schema(
       trim: true,
       maxlength: 32,
     },
-    color: {
-      type: String,
-      enum: ["cyan", "blue", "purple", "orange", "red"],
-      default: "cyan",
-    },
   },
   { timestamps: true }
 )

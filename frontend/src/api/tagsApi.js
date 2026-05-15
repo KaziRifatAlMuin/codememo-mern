@@ -1,41 +1,22 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001"
-const BASE_URL = `${API_URL}/api/tags`
+import { apiRequest } from "./apiClient.js"
 
 export const tagsKeys = {
   all: ["tags"],
 }
 
-async function handleResponse(response) {
-  if (!response.ok) {
-    let message = "Request failed"
-    try {
-      const payload = await response.json()
-      message = payload?.message || message
-    } catch {
-      message = response.statusText || message
-    }
-    throw new Error(message)
-  }
-  return response.json()
-}
-
 export async function fetchTags() {
-  const response = await fetch(BASE_URL)
-  return handleResponse(response)
+  return apiRequest("/api/tags")
 }
 
 export async function createTag(tag) {
-  const response = await fetch(BASE_URL, {
+  return apiRequest("/api/tags", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(tag),
   })
-  return handleResponse(response)
 }
 
 export async function deleteTag(id) {
-  const response = await fetch(`${BASE_URL}/${id}`, {
+  return apiRequest(`/api/tags/${id}`, {
     method: "DELETE",
   })
-  return handleResponse(response)
 }

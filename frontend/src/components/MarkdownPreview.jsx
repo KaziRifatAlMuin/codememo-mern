@@ -18,20 +18,25 @@ export default function MarkdownPreview({ content }) {
   const lines = (content || "").split("\n")
   const nodes = []
   let listItems = []
+  let listType = "ul"
   let codeLines = []
   let inCode = false
 
   const flushList = () => {
     if (!listItems.length) return
 
+    const ListTag = listType === "ol" ? "ol" : "ul"
+    const listClass = listType === "ol" ? "list-decimal" : "list-disc"
+
     nodes.push(
-      <ul key={`list-${nodes.length}`} className="list-disc space-y-1 pl-5 text-base-content/75">
+      <ListTag key={`list-${nodes.length}`} className={`${listClass} space-y-1 pl-5 text-base-content/75`}>
         {listItems.map((item, index) => (
           <li key={index}>{renderInline(item)}</li>
         ))}
-      </ul>
+      </ListTag>
     )
     listItems = []
+    listType = "ul"
   }
 
   const flushCode = () => {
@@ -95,7 +100,17 @@ export default function MarkdownPreview({ content }) {
     }
 
     if (line.startsWith("- ")) {
+      if (listType !== "ul") flushList()
+      listType = "ul"
       listItems.push(line.slice(2))
+      return
+    }
+
+    const orderedMatch = line.match(/^\d+\.\s+(.*)$/)
+    if (orderedMatch) {
+      if (listType !== "ol") flushList()
+      listType = "ol"
+      listItems.push(orderedMatch[1])
       return
     }
 

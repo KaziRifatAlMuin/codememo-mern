@@ -3,6 +3,8 @@ import cors from "cors"
 import mongoose from "mongoose"
 import notesRoutes from "./routes/notesRoutes.js"
 import tagsRoutes from "./routes/tagsRoutes.js"
+import authRoutes from "./routes/authRoutes.js"
+import usersRoutes from "./routes/usersRoutes.js"
 import connectDB from "./config/db.js"
 import dotenv from "dotenv"
 
@@ -15,8 +17,10 @@ const corsOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
 
 app.use(cors({ origin: corsOrigins }))
 app.use(express.json())
+app.use("/api/auth", authRoutes)
 app.use("/api/notes", notesRoutes)
 app.use("/api/tags", tagsRoutes)
+app.use("/api/users", usersRoutes)
 
 app.get("/api/health", (req, res) => {
     const dbConnected = mongoose.connection.readyState === 1

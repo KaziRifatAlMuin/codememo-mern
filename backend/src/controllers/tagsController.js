@@ -1,7 +1,6 @@
 import mongoose from "mongoose"
 import Tag from "../models/Tag.js"
 
-const allowedColors = new Set(["cyan", "blue", "purple", "orange", "red"])
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id)
 
 const cleanTagName = (name) =>
@@ -20,14 +19,13 @@ export async function getAllTags(req, res) {
 export async function createTag(req, res) {
   try {
     const name = cleanTagName(req.body?.name)
-    const color = allowedColors.has(req.body?.color) ? req.body.color : "cyan"
 
     if (!name) return res.status(400).json({ message: "Tag name is required" })
 
     const existing = await Tag.findOne({ name }).collation({ locale: "en", strength: 2 })
     if (existing) return res.status(200).json(existing)
 
-    const tag = await Tag.create({ name, color })
+    const tag = await Tag.create({ name })
     res.status(201).json(tag)
   } catch (err) {
     console.error("createTag error:", err)

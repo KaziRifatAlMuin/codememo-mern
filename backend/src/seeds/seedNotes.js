@@ -19,7 +19,7 @@ const seed = async () => {
         language: 'cpp',
         codeSnippet: 'int lo = 0, hi = n - 1;\nwhile (lo <= hi) {\n  int mid = lo + (hi - lo) / 2;\n  if (ok(mid)) hi = mid - 1;\n  else lo = mid + 1;\n}',
         problemUrl: 'https://codeforces.com/problemset',
-        revisionStatus: 'Revised',
+        revisionStatus: 'In Mind',
       },
       {
         title: 'Segment Tree',
@@ -29,17 +29,18 @@ const seed = async () => {
         language: 'cpp',
         codeSnippet: 'void update(int node, int start, int end, int idx, int val) {\n  if (start == end) tree[node] = val;\n}',
         problemUrl: 'https://atcoder.jp/',
-        revisionStatus: 'New',
+        revisionStatus: 'To Do',
       },
     ]
 
     await Note.deleteMany({})
     await Tag.deleteMany({})
     await Tag.insertMany([
-      { name: 'algorithms', color: 'cyan' },
-      { name: 'search', color: 'blue' },
-      { name: 'data-structures', color: 'purple' },
-      { name: 'trees', color: 'orange' },
+      { name: 'number-theory' },
+      { name: 'combinatorics' },
+      { name: 'dp' },
+      { name: 'stl' },
+      { name: 'trees' },
     ])
     const created = await Note.insertMany(sampleNotes)
     console.log(`Inserted ${created.length} notes`)
