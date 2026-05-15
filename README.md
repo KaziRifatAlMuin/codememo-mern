@@ -1,54 +1,98 @@
 # MERN Thinkboard
 
-## Backend Setup
+## Overview
 
-Use the following steps to initialize and install the backend dependencies:
+This project includes a MongoDB-backed notes API for a MERN stack. The backend connects to MongoDB via Mongoose and exposes REST endpoints under `/api/notes`.
+
+## Prerequisites
+
+- Node.js 18+ and npm
+- Docker Desktop for Windows (recommended for local MongoDB): https://www.docker.com/products/docker-desktop/
+
+## Backend setup (first time)
+
+Install backend dependencies:
 
 ```powershell
 cd backend
-npm init -y
-npm install express@4.18.2
-npm install nodemon -D
+npm install
 ```
 
-If you see vulnerability warnings after installation, you can review them with:
+Create an environment file from the example:
 
 ```powershell
-npm audit
+Copy-Item .env.example .env
 ```
 
-To attempt an automatic fix for issues that do not require breaking changes, run:
+Update `MONGO_URI` in `.env` if you use a different database connection string.
+
+## Database setup (Docker, recommended)
+
+The repo includes a `docker-compose.yml` that runs MongoDB and Mongo Express for easy local inspection.
+
+Step 1: Start the database services:
 
 ```powershell
-npm audit fix
+docker compose up -d
 ```
 
-## Scripts
-
-Add the following `scripts` block to the backend package file:
-
-```json
-"scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js"
-}
-```
-
-After that, you can start the backend with:
+Step 2: Check that both containers are running:
 
 ```powershell
+docker compose ps
+```
+
+Step 3: Use the default local connection string in `.env`:
+
+```
+mongodb://localhost:27017/thinkboard-db
+```
+
+Step 4 (optional): Open Mongo Express in your browser:
+
+- http://localhost:8081
+
+To stop the containers:
+
+```powershell
+docker compose down
+```
+
+### Alternative: MongoDB Atlas (cloud)
+
+1. Create a free cluster at https://www.mongodb.com/cloud/atlas and create a database user.
+2. Whitelist your IP (or allow access from anywhere for quick testing).
+3. Copy the connection string provided by Atlas and set it as `MONGO_URI` in `.env`.
+
+Example:
+
+```
+mongodb+srv://<username>:<password>@cluster0.abcd1.mongodb.net/thinkboard-db?retryWrites=true&w=majority
+```
+
+## Run the backend
+
+```powershell
+cd backend
 npm run dev
 ```
 
-This starts the server with Nodemon so changes reload automatically.
+Health check:
 
-## Example Server Output
+- http://localhost:5001/api/health
 
-When the server runs successfully, you should see:
+## View links
 
-```powershell
-Server is running on port 5001
-```
+- API health: http://localhost:5001/api/health
+- Mongo Express UI: http://localhost:8081
+
+## API endpoints
+
+- `GET /api/notes`
+- `GET /api/notes/:id`
+- `POST /api/notes`
+- `PUT /api/notes/:id`
+- `DELETE /api/notes/:id`
 
 ## Troubleshooting
 
@@ -61,8 +105,3 @@ npm run dev
 ```
 
 Replace `12244` with the process ID returned by the first command.
-
-## Notes
-
-- Make sure Node.js and npm are installed before running the setup commands.
-- You can add more scripts later in the backend package file as needed.
