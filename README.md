@@ -50,6 +50,18 @@ When the server runs successfully, you should see:
 Server is running on port 5001
 ```
 
+## Troubleshooting
+
+If port `5001` is already in use, run these commands from PowerShell:
+
+```powershell
+Get-NetTCPConnection -LocalPort 5001 | Select-Object -ExpandProperty OwningProcess
+Stop-Process -Id 12244 -Force
+npm run dev
+```
+
+Replace `12244` with the process ID returned by the first command.
+
 ## Notes
 
 - Make sure Node.js and npm are installed before running the setup commands.
