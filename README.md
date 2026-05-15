@@ -8,6 +8,7 @@ Use the following steps to initialize and install the backend dependencies:
 cd backend
 npm init -y
 npm install express@4.18.2
+npm install nodemon -D
 ```
 
 If you see vulnerability warnings after installation, you can review them with:
@@ -28,8 +29,8 @@ Add the following `scripts` block to the backend package file:
 
 ```json
 "scripts": {
-	"test": "echo \"Error: no test specified\" && exit 1",
-	"dev": "node server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
 }
 ```
 
@@ -39,7 +40,7 @@ After that, you can start the backend with:
 npm run dev
 ```
 
-This starts the server with Node.js.
+This starts the server with Nodemon so changes reload automatically.
 
 ## Example Server Output
 
@@ -53,4 +54,3 @@ Server is running on port 5001
 
 - Make sure Node.js and npm are installed before running the setup commands.
 - You can add more scripts later in the backend package file as needed.
-# mern-thinkboard
