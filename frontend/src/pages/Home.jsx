@@ -275,7 +275,7 @@ export default function Home() {
             <div>
               <h1 className="text-lg font-semibold leading-tight">Problem Review Tracker</h1>
               <p className="text-xs text-base-content/60">
-                Compact memo table for problems, status, topics, thinking notes, and resolve state.
+                Compact memo cards for problems, status, topics, thinking notes, and review state.
               </p>
             </div>
           </div>

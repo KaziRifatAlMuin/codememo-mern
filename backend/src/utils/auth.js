@@ -38,6 +38,7 @@ export function verifyToken(token = "") {
   const [body, signature] = token.split(".")
   if (!body || !signature) return null
   const expected = crypto.createHmac("sha256", TOKEN_SECRET).update(body).digest("base64url")
+  if (signature.length !== expected.length) return null
   if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null
 
   const payload = JSON.parse(fromBase64url(body))

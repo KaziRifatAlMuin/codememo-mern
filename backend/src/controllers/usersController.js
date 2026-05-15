@@ -11,23 +11,38 @@ const publicUser = (user) => ({
 })
 
 export async function getUsers(req, res) {
-  const users = await User.find().select("-passwordHash").sort({ createdAt: -1 })
-  res.status(200).json(users.map(publicUser))
+  try {
+    const users = await User.find().select("-passwordHash").sort({ createdAt: -1 })
+    res.status(200).json(users.map(publicUser))
+  } catch (err) {
+    console.error("getUsers error:", err)
+    res.status(500).json({ message: "Server error" })
+  }
 }
 
 export async function getUser(req, res) {
-  const user = await User.findById(req.params.id).select("-passwordHash")
-  if (!user) return res.status(404).json({ message: "User not found" })
-  res.status(200).json(publicUser(user))
+  try {
+    const user = await User.findById(req.params.id).select("-passwordHash")
+    if (!user) return res.status(404).json({ message: "User not found" })
+    res.status(200).json(publicUser(user))
+  } catch (err) {
+    console.error("getUser error:", err)
+    res.status(500).json({ message: "Server error" })
+  }
 }
 
 export async function updateUser(req, res) {
-  const payload = {}
-  if (typeof req.body?.name === "string") payload.name = req.body.name.trim()
-  if (typeof req.body?.bio === "string") payload.bio = req.body.bio.trim()
-  if (["user", "admin"].includes(req.body?.role)) payload.role = req.body.role
+  try {
+    const payload = {}
+    if (typeof req.body?.name === "string") payload.name = req.body.name.trim()
+    if (typeof req.body?.bio === "string") payload.bio = req.body.bio.trim()
+    if (["user", "admin"].includes(req.body?.role)) payload.role = req.body.role
 
-  const user = await User.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true }).select("-passwordHash")
-  if (!user) return res.status(404).json({ message: "User not found" })
-  res.status(200).json(publicUser(user))
+    const user = await User.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true }).select("-passwordHash")
+    if (!user) return res.status(404).json({ message: "User not found" })
+    res.status(200).json(publicUser(user))
+  } catch (err) {
+    console.error("updateUser error:", err)
+    res.status(500).json({ message: "Server error" })
+  }
 }

@@ -300,10 +300,10 @@ function NoteForm({ id, initialNote }) {
             <label className="form-control">
               <span className="label py-1 text-xs font-medium">Accepted</span>
               <input
+                type="date"
                 className="input input-bordered glass-input h-10 min-h-10 text-sm placeholder:text-base-content/30"
                 value={acceptedDate}
                 onChange={(event) => setAcceptedDate(event.target.value)}
-                placeholder="Solved date"
               />
             </label>
             <label className="form-control">

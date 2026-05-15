@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { fetchMe, login as loginRequest, register as registerRequest, updateMe as updateMeRequest } from "../api/authApi.js"
