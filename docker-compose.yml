@@ -16,6 +16,33 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongo
       ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+    depends_on:
+      - mongo
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      MONGO_URI: mongodb://mongo:27017/thinkboard-db
+      PORT: 5001
+      CORS_ORIGIN: http://localhost:5173
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:5001
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:5001
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
 
 volumes:
   mongo-data:

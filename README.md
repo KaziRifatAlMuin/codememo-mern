@@ -9,6 +9,20 @@ This project includes a MongoDB-backed notes API for a MERN stack. The backend c
 - Node.js 18+ and npm
 - Docker Desktop for Windows (recommended for local MongoDB): https://www.docker.com/products/docker-desktop/
 
+## Quick start (full stack with Docker)
+
+Build and run everything (MongoDB, API, frontend):
+
+```powershell
+docker compose up --build -d
+```
+
+View links:
+
+- Frontend: http://localhost:5173
+- API health: http://localhost:5001/api/health
+- Mongo Express UI: http://localhost:8081
+
 ## Backend setup (first time)
 
 Install backend dependencies:
@@ -25,6 +39,7 @@ Copy-Item .env.example .env
 ```
 
 Update `MONGO_URI` in `.env` if you use a different database connection string.
+Update `CORS_ORIGIN` if your frontend runs on a different URL.
 
 ## Database setup (Docker, recommended)
 
@@ -81,10 +96,45 @@ Health check:
 
 - http://localhost:5001/api/health
 
+## Frontend setup (Vite + React)
+
+Install frontend dependencies:
+
+```powershell
+cd frontend
+npm install
+```
+
+Create an environment file from the example:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Set `VITE_API_URL` in `.env` if your backend runs on a different URL.
+
+Install router and toast notifications:
+
+```powershell
+cd frontend
+npm install react-router-dom react-hot-toast
+```
+
+Start the frontend dev server:
+
+```powershell
+npm run dev
+```
+
+Frontend view link (Vite dev server):
+
+- http://localhost:5173
+
 ## View links
 
 - API health: http://localhost:5001/api/health
 - Mongo Express UI: http://localhost:8081
+- Frontend (dev): http://localhost:5173
 
 ## API endpoints
 
